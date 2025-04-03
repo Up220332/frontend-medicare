@@ -1,0 +1,40 @@
+{
+  "name": "crm-pwa",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
+    "@mui/icons-material": "^6.4.6",
+    "@mui/material": "^6.4.8",
+    "@mui/styled-engine-sc": "^6.4.6",
+    "axios": "^1.8.2",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
+    "html2pdf.js": "^0.10.3",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.0",
+    "jwt-decode": "^4.0.0",
+    "next": "^15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.0"
+  }
+}
