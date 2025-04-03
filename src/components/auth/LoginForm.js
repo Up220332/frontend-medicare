@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Link } from '@mui/material';
+import { TextField, Button, Typography, Box, Link as MuiLink } from '@mui/material';
 import { login } from '../../services/auth';
-import { useRouter } from 'next/router';  
+import { useRouter } from 'next/router';
+import Link from 'next/link'; // Importación añadida para Next.js Link
 
 const LoginForm = () => {
   const [credentials, setCredentials] = useState({
@@ -88,9 +89,9 @@ const LoginForm = () => {
       </Button>
       
       <Box sx={{ mt: 2, textAlign: 'center' }}>
-        <Link href="/auth/register" underline="hover">     
-        Don't have an account? Sign up
-        </Link>
+        <MuiLink component={Link} href="/auth/register" underline="hover">
+          Don&apos;t have an account? Sign up
+        </MuiLink>
       </Box>
     </Box>
   );
