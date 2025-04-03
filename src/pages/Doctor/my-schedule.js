@@ -13,6 +13,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
 import { format, parseISO, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { useRouter } from 'next/router';
 
 const DoctorSchedule = () => {
   const [appointments, setAppointments] = useState([]);
@@ -26,17 +27,23 @@ const DoctorSchedule = () => {
     status: 'scheduled'
   });
   const [openDialog, setOpenDialog] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        if (!token || !user) {
+          router.push('/auth/login');
+          return;
+        }
+
         const response = await axios.get(`http://localhost:3001/api/appointments/doctor/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        console.log("Doctor's Appointments from API:", response.data);
         setAppointments(response.data);
       } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -46,7 +53,7 @@ const DoctorSchedule = () => {
     };
 
     fetchAppointments();
-  }, []);
+  }, [router]);
 
   const handleEventClick = (info) => {
     const appointment = appointments.find(app => app.id === info.event.id);
@@ -136,7 +143,7 @@ const DoctorSchedule = () => {
           <Schedule fontSize="large" />
         </Avatar>
         <Box>
-          <Typography variant="h4">Doctor's Schedule</Typography>
+        <Typography variant="h4">Doctor&apos;s Schedule</Typography>
           <Typography variant="subtitle1" color="text.secondary">
             Manage your appointments and earnings
           </Typography>

@@ -53,7 +53,7 @@ const PatientProfile = () => {
     }
 
     fetchPatient(storedUser.id, storedToken);
-  }, []);
+  }, [router]);
 
   const handleEdit = async () => {
     try {

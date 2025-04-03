@@ -11,12 +11,17 @@ import { AuthProvider } from '../context/AuthContext';
 
 const MyApp = ({ Component, pageProps }) => {
   const [user, setUser] = useState(null);
+  const [mounted, setMounted] = useState(false); // Nueva variable de control
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
       setUser(JSON.parse(localStorage.getItem("user")));
     }
   }, []);
+
+  // Evita renderizar en servidor hasta que el componente se monte
+  if (!mounted) return null;
 
   const LayoutComponent = user?.role === "Doctor" ? DoctorLayout 
                         : user?.role === "Patient" ? PatientLayout 

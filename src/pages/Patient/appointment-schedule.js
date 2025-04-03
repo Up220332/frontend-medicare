@@ -13,40 +13,48 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
 import { format, parseISO } from 'date-fns';
+import { useRouter } from 'next/router';
 
 const MySchedule = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [updatedAppointment, setUpdatedAppointment] = useState({
-    service: '',
-    price: 0,
-    appointmentDate: '',
-    notes: '',
-    status: 'scheduled'
+  const [state, setState] = useState({
+    appointments: [],
+    loading: true,
+    selectedAppointment: null,
+    updatedAppointment: {
+      service: '',
+      price: 0,
+      appointmentDate: '',
+      notes: '',
+      status: 'scheduled'
+    }
   });
   const [openDialog, setOpenDialog] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        if (!token || !user) {
+          router.push('/auth/login');
+          return;
+        }
+
         const response = await axios.get(`http://localhost:3001/api/appointments/patient/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        console.log('Appointments from API:', response.data); // 🔹 Verificar citas en consola
-        setAppointments(response.data);
+        setState(prev => ({...prev, appointments: response.data, loading: false}));
       } catch (error) {
         console.error('Error fetching appointments:', error);
-      } finally {
-        setLoading(false);
+        setState(prev => ({...prev, loading: false}));
       }
     };
 
     fetchAppointments();
-  }, []);
+  }, [router]);
 
   const handleEventClick = (info) => {
     const appointment = appointments.find(app => app._id === info.event.id);

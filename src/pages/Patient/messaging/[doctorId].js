@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { Container, Typography, Box, Paper, TextField, Button, Grid, List, ListItem, ListItemText, Divider } from '@mui/material';
 
@@ -9,15 +9,7 @@ const Messaging = () => {
   const [selectedChat, setSelectedChat] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const { doctorId } = router.query; 
-    if (doctorId) {
-      setDoctorId(doctorId);
-      fetchChats(doctorId);
-    }
-  }, [router.query]);
-
-  const fetchChats = (doctorId) => {
+  const fetchChats = useCallback((doctorId) => {
     const existingChat = chats.find((chat) => chat.doctorId === doctorId);
     if (existingChat) {
       setSelectedChat(existingChat);
@@ -30,7 +22,15 @@ const Messaging = () => {
       setChats([...chats, newChat]);
       setSelectedChat(newChat);
     }
-  };
+  }, [chats]); // Add chats as dependency since it's used inside the callback
+
+  useEffect(() => {
+    const { doctorId } = router.query; 
+    if (doctorId) {
+      setDoctorId(doctorId);
+      fetchChats(doctorId);
+    }
+  }, [router.query, fetchChats]); // Now fetchChats is stable between renders
 
   const handleSendMessage = () => {
     if (newMessage.trim() && selectedChat) {

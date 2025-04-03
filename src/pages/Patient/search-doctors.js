@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { Container, Typography, TextField, Grid, Card, CardContent, CardActions, Button, Box, Alert } from '@mui/material';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ const SearchDoctors = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const checkAuth = () => {
+  const checkAuth = useCallback(() => {
     if (typeof window === 'undefined') return false;
     
     try {
@@ -32,9 +32,9 @@ const SearchDoctors = () => {
       console.error('Error parsing user data:', e);
       return false;
     }
-  };
+  }, []);
 
-  const fetchDoctors = async (token) => {
+  const fetchDoctors = useCallback(async (token) => {
     try {
       setLoading(true);
       setError(null);
@@ -77,7 +77,7 @@ const SearchDoctors = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     const authData = checkAuth();
@@ -89,7 +89,7 @@ const SearchDoctors = () => {
     }
     
     fetchDoctors(authData.token);
-  }, []);
+  }, [checkAuth, fetchDoctors, router]);
 
   if (loading) {
     return (
@@ -133,9 +133,9 @@ const SearchDoctors = () => {
                 <Typography variant="body2"><strong>Specialty:</strong> {doctor.specialty}</Typography>
               </CardContent>
               <CardActions>
-              <Link href={`/Patient/doctor-profile/${doctor._id}`} passHref> 
-              <Button size="small" color="primary">See profile</Button>
-              </Link>
+                <Link href={`/Patient/doctor-profile/${doctor._id}`} passHref> 
+                  <Button size="small" color="primary">See profile</Button>
+                </Link>
               </CardActions>
             </Card>
           </Grid>

@@ -16,31 +16,61 @@ import axios from 'axios';
 import Link from 'next/link';
 
 const PatientHomePage = () => {
-  const [patient, setPatient] = useState(null);
-  const [appointments, setAppointments] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [state, setState] = useState({
+    patient: null,
+    appointments: [],
+    messages: [],
+    prescriptions: [],
+    loading: true,
+    error: null
+  });
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        if (!token || !user || user.role !== 'Patient') {
+          router.push('/auth/login');
+          return;
+        }
 
-      console.log("Token en PatientHomePage:", token); 
-      console.log("User en PatientHomePage:", user);  
+        setState(prev => ({...prev, loading: true, error: null}));
 
-      if (!token || !user || user.role !== 'Patient') {
-        console.warn("Token no encontrado o rol incorrecto, redirigiendo al login...");
-        router.push('/auth/login');
-        return;
+        const headers = { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        const [patientRes, appointmentsRes, messagesRes, prescriptionsRes] = await Promise.all([
+          axios.get(`http://localhost:3001/api/patients/${user.id}`, { headers }).catch(() => ({ data: null })),
+          axios.get(`http://localhost:3001/api/appointments/${user.id}`, { headers }).catch(() => ({ data: [] })),
+          axios.get(`http://localhost:3001/api/messages/${user.id}`, { headers }).catch(() => ({ data: [] })),
+          axios.get(`http://localhost:3001/api/prescriptions/${user.id}`, { headers }).catch(() => ({ data: [] }))
+        ]);
+
+        setState({
+          patient: patientRes.data,
+          appointments: appointmentsRes.data,
+          messages: messagesRes.data,
+          prescriptions: prescriptionsRes.data,
+          loading: false,
+          error: null
+        });
+
+      } catch (err) {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: 'Error al cargar los datos. Inténtalo nuevamente.'
+        }));
       }
+    };
 
-      fetchData(user.id, token);
-    }
-  }, []);
+    fetchData();
+  }, [router]);
 
   const fetchData = async (patientId, token) => {
     try {

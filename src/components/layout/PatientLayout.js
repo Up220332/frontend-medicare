@@ -10,9 +10,9 @@ const PatientLayout = ({ children }) => {
     const user = JSON.parse(localStorage.getItem('user'));
     
     if (!token || user?.role !== 'Patient') {
-      router.push('auth/login'); 
+      router.push('/auth/login'); 
     }
-  }, []);
+  }, [router]); // Añadido router como dependencia
 
   return (
     <>
